@@ -15,7 +15,7 @@ nltk.download('stopwords', quiet=True)
 
 MODELS_DIR = Path("models")
 
-st.set_page_config(page_title="Hate Speech Detector", page_icon="shield")
+st.set_page_config(page_title="Hate Speech Detector", page_icon="loto.png")
 
 
 # ─── Custom Stopwords (same as notebook) ─────────────────────────────────────
