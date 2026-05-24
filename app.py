@@ -68,35 +68,27 @@ def preprocess_text(text):
 
 
 @st.cache_resource
-def load_models():
-    """Load all saved models, vectorizer, and training summary."""
-    model_files = {
-        "Logistic Regression": "logistic_regression.pkl",
-        "Naive Bayes": "naive_bayes.pkl",
-        "SVM": "svm.pkl",
-        "Stacking Ensemble": "stacking_ensemble.pkl",
-    }
-    models = {}
-    for name, fname in model_files.items():
-        with open(MODELS_DIR / fname, 'rb') as f:
-            models[name] = pickle.load(f)
+def load_model():
+    """Load the ensemble model, vectorizer, and training summary."""
+    with open(MODELS_DIR / "stacking_ensemble.pkl", 'rb') as f:
+        model = pickle.load(f)
 
     with open(MODELS_DIR / "tfidf_vectorizer.pkl", 'rb') as f:
         vectorizer = pickle.load(f)
+
     with open(MODELS_DIR / "training_summary.json", 'r') as f:
         summary = json.load(f)
 
-    return models, vectorizer, summary
+    return model, vectorizer, summary
 
 
-models, vectorizer, summary = load_models()
+model, vectorizer, summary = load_model()
 
 
-def predict(text, model_name):
+def predict(text):
     """Run prediction on a single text."""
     processed = preprocess_text(text)
     features = vectorizer.transform([processed])
-    model = models[model_name]
     prediction = model.predict(features)[0]
 
     toxic_prob = None
@@ -111,20 +103,19 @@ def predict(text, model_name):
 
 st.title("Hate Speech Detector")
 
-# Sidebar: model selection + performance
-with st.sidebar:
-    st.header("Model")
-    model_choice = st.selectbox("Select Model", list(models.keys()), index=3)
-
-    st.divider()
-    st.header("Performance")
-    for res in summary.get("all_models_results", []):
-        name = res["Model"]
-        marker = " (selected)" if name == model_choice else ""
-        st.markdown(f"**{name}**{marker}")
-        st.caption(
-            f"F1: {res['F1 Score']:.4f} | Acc: {res['Accuracy']:.4f} | AUC: {res.get('ROC-AUC', 0):.4f}"
-        )
+# Model performance
+st.header("Model: Stacking Ensemble")
+res = next(
+    (r for r in summary.get("all_models_results", []) if r["Model"] == "Stacking Ensemble"),
+    None,
+)
+if res:
+    cols = st.columns(5)
+    cols[0].metric("F1 Score", f"{res['F1 Score']:.2f}")
+    cols[1].metric("Accuracy", f"{res['Accuracy']:.2f}")
+    cols[2].metric("Precision", f"{res['Precision']:.2f}")
+    cols[3].metric("Recall", f"{res['Recall']:.2f}")
+    cols[4].metric("ROC-AUC", f"{res['ROC-AUC']:.2f}")
 
 # Main input
 with st.form(key="analyze_form", enter_to_submit=True):
@@ -136,7 +127,7 @@ if analyze_btn:
         st.warning("Please enter some text.")
     else:
         with st.spinner("Analyzing..."):
-            prediction, toxic_prob, processed = predict(user_text, model_choice)
+            prediction, toxic_prob, processed = predict(user_text)
 
         if prediction == 1:
             st.error("**TOXIC — Hate Speech Detected**")
