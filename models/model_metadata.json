@@ -1,0 +1,119 @@
+{
+  "project_name": "Hate Speech Detector",
+  "task_type": "binary_classification",
+  "best_model_name": "Stacking Ensemble",
+  "best_model_file": "stacking_ensemble.pkl",
+  "vectorizer_file": "tfidf_vectorizer.pkl",
+  "label_mapping": {
+    "0": "Non-Toxic",
+    "1": "Toxic"
+  },
+  "threshold": 0.5,
+  "dataset_shape_before_preprocessing": [
+    726119,
+    2
+  ],
+  "dataset_shape_after_preprocessing": [
+    723890,
+    3
+  ],
+  "train_size": 579112,
+  "test_size": 144778,
+  "random_state": 42,
+  "preprocessing_steps": [
+    "lowercase",
+    "url/html/mention/hashtag removal",
+    "repeated character normalization",
+    "punctuation removal",
+    "non-alphabetic character removal",
+    "word_tokenize",
+    "stopword removal (english + custom)",
+    "porter stemming",
+    "remove tokens < 2 chars",
+    "remove empty texts"
+  ],
+  "vectorizer_configuration": {
+    "type": "FeatureUnion",
+    "transformers": [
+      {
+        "name": "word",
+        "type": "TfidfVectorizer",
+        "analyzer": "word",
+        "ngram_range": [
+          1,
+          2
+        ],
+        "max_features": 12000,
+        "sublinear_tf": true,
+        "min_df": 5,
+        "max_df": 0.95
+      },
+      {
+        "name": "char",
+        "type": "TfidfVectorizer",
+        "analyzer": "char_wb",
+        "ngram_range": [
+          3,
+          4
+        ],
+        "max_features": 8000,
+        "sublinear_tf": true,
+        "min_df": 5,
+        "max_df": 0.95
+      }
+    ]
+  },
+  "model_results": [
+    {
+      "Model": "Stacking Ensemble",
+      "Accuracy": 0.8276464656232301,
+      "Precision": 0.8277032476563599,
+      "Recall": 0.8276464656232301,
+      "F1 Score": 0.8276343281570813,
+      "ROC-AUC": 0.9098255774653269,
+      "CV F1 Mean": 0.8268389368335199,
+      "CV F1 Std": 0.0008303722995628845
+    },
+    {
+      "Model": "SVM",
+      "Accuracy": 0.8275290444680822,
+      "Precision": 0.8275912976193196,
+      "Recall": 0.8275290444680822,
+      "F1 Score": 0.827515967316138,
+      "ROC-AUC": 0.9098554162015718,
+      "CV F1 Mean": 0.8267007756187359,
+      "CV F1 Std": 0.0008036395875885345
+    },
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.8236196107143351,
+      "Precision": 0.8236711605123697,
+      "Recall": 0.8236196107143351,
+      "F1 Score": 0.8236079473163833,
+      "ROC-AUC": 0.9062377598117453,
+      "CV F1 Mean": 0.8226178150494448,
+      "CV F1 Std": 0.00110828488850965
+    },
+    {
+      "Model": "Naive Bayes",
+      "Accuracy": 0.7781016452775974,
+      "Precision": 0.7844449052448028,
+      "Recall": 0.7781016452775974,
+      "F1 Score": 0.7767864593354521,
+      "ROC-AUC": 0.862560581762712,
+      "CV F1 Mean": 0.7781065955272579,
+      "CV F1 Std": 0.0011774309704279077
+    }
+  ],
+  "best_model_metrics": {
+    "F1 Score": 0.8276343281570813,
+    "Precision": 0.8277032476563599,
+    "Recall": 0.8276464656232301,
+    "Accuracy": 0.8276464656232301,
+    "ROC-AUC": 0.9098255774653269
+  },
+  "created_at": "2026-05-27T12:28:54.697579",
+  "sklearn_version": "1.7.0",
+  "numpy_version": "2.4.4",
+  "pandas_version": "2.2.3"
+}
