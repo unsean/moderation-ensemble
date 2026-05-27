@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
-.streamlit/
+.windsurf/
 .ipynb_checkpoints/
 data/
 
