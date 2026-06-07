@@ -6,6 +6,7 @@ using an ensemble of ML models (Stacking, SVM, Logistic Regression, Naive Bayes)
 
 import re
 import json
+import time
 import string
 import pickle
 from pathlib import Path
@@ -633,8 +634,9 @@ def load_training_summary():
 artifact = load_artifact()
 vectorizer = load_vectorizer()
 training_summary = load_training_summary()
-# Pre-warm default model cache so Analyze button feels instant
+# Pre-warm caches so Analyze button feels instant
 _default_model = load_model("stacking_ensemble")
+_explainer = load_explainer()
 
 
 # ─────────────────────────────────────────────────────
@@ -745,15 +747,21 @@ if page == "Hate Speech Detector":
         if not user_text.strip():
             st.warning("Please enter some text before analyzing.")
         else:
+            t0 = time.perf_counter()
             with st.spinner("Analyzing…"):
                 model_key = MODEL_KEYS[selected_model]
                 model = load_model(model_key)
+                t1 = time.perf_counter()
 
                 preprocessed = preprocess_text(user_text)
+                t2 = time.perf_counter()
+
                 features = vectorizer.transform([preprocessed])
+                t3 = time.perf_counter()
 
                 prediction = model.predict(features)[0]
                 probabilities = model.predict_proba(features)[0]
+                t4 = time.perf_counter()
 
                 # probabilities: [p_safe, p_hate]
                 safe_pct = probabilities[0] * 100
@@ -761,11 +769,22 @@ if page == "Hate Speech Detector":
 
                 is_hate = prediction == 1
                 flagged_words = []
+                t5 = time.perf_counter()
                 if is_hate:
                     explainer = load_explainer()
                     flagged_words = get_flagged_words(features, vectorizer, explainer)
+                t6 = time.perf_counter()
 
-                # ── Results card ────────────────────────
+            elapsed = t6 - t0
+            timing_breakdown = {
+                "load_model": (t1 - t0) * 1000,
+                "preprocess": (t2 - t1) * 1000,
+                "vectorize": (t3 - t2) * 1000,
+                "predict": (t4 - t3) * 1000,
+                "explain": (t6 - t5) * 1000,
+            }
+
+            # ── Results card ────────────────────────
             card_class = "card-danger" if is_hate else "card-safe"
             verdict_color = "var(--danger-main)" if is_hate else "var(--safe-main)"
             verdict_text = "Hate Speech Detected" if is_hate else "Text Appears Safe"
@@ -816,6 +835,16 @@ if page == "Hate Speech Detector":
                 </div>
                 """,
                 unsafe_allow_html=True,
+            )
+
+            tb = timing_breakdown
+            st.caption(
+                f"Total: {elapsed*1000:.0f} ms  |  "
+                f"load: {tb['load_model']:.1f} ms  |  "
+                f"preprocess: {tb['preprocess']:.1f} ms  |  "
+                f"vectorize: {tb['vectorize']:.1f} ms  |  "
+                f"predict: {tb['predict']:.1f} ms  |  "
+                f"explain: {tb['explain']:.1f} ms"
             )
 
             # ── Donut charts ────────────────────────
