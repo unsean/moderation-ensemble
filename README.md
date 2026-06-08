@@ -35,7 +35,9 @@ This project builds an end-to-end hate speech detection system. The goal is to c
 - The dataset is balanced, preventing model bias toward one class.
 - Contains 25,046 duplicate rows that were identified during EDA.
 - Likely sourced from Wikipedia talk pages, introducing domain-specific vocabulary (e.g., "article", "page", "edit").
-- File size is 138 MB; tracked via Git LFS due to GitHub's 100 MB file limit.
+- File size is 138 MB, exceeding GitHub's 100 MB limit.
+- **Download:** [Google Drive - HateSpeechDatasetBalanced.csv](https://drive.google.com/file/d/1_9TRlyYLa17BAE-GZY4UDJ94xI3bdiEx/view?usp=sharing)
+- Alternatively, a link file is available in `data/DATASET_LINK.txt`
 
 ---
 

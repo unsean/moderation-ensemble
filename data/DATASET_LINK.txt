@@ -1,0 +1,6 @@
+HateSpeechDatasetBalanced.csv is too large for GitHub (138 MB > 100 MB limit).
+Download the dataset from Google Drive here:
+
+https://drive.google.com/file/d/1_9TRlyYLa17BAE-GZY4UDJ94xI3bdiEx/view?usp=sharing
+
+After downloading, place the file in this data/ folder.

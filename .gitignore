@@ -2,4 +2,4 @@ __pycache__/
 *.pyc
 .windsurf/
 .ipynb_checkpoints/
-data/
+data/*.csv
