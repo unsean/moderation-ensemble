@@ -42,6 +42,7 @@ This project builds an end-to-end hate speech detection system. The goal is to c
 ---
 
 ## 3. Analysis
+**For a more thorough analysis, please check out ExtendedAnalysis.md instead**
 
 The complete analysis — including Exploratory Data Analysis (EDA), preprocessing, feature extraction, model training, evaluation, and visualization — is documented in **`main.ipynb`**.
 
